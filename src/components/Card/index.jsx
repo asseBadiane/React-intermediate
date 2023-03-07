@@ -1,7 +1,9 @@
 // La biblothèque "prop-types" nous permet de sécuriser nos props 
 import PropTypes from 'prop-types'
+import { useState } from 'react'
 import styled from 'styled-components'
 import DefaultPicture from '../../assets/profile.png'
+import { useTheme } from '../../utils/hooks'
 import colors from '../../utils/style/colors'
 
 const CardLabel = styled.span`
@@ -13,6 +15,15 @@ const CardImage = styled.img`
     height: 80px;
     width: 80px;
     border-radius: 50%;
+`
+const CardTitle = styled.div`
+  color: ${({ theme }) => (theme === 'light' ? '#000000' : '#ffffff')};
+  font-size: 22px;
+  font-weight: normal;
+  align-self: center;
+  height: 25px;
+  display: flex;
+  align-items: center;
 `
 const CardWrapper = styled.div`
     display: flex;
@@ -28,11 +39,17 @@ const CardWrapper = styled.div`
     }
 `
 function Card({label, title, picture}) {
+    const { theme } = useTheme()
+    const [isFavorite, setIsFavorite] = useState(false)
+    const star = isFavorite ? '⭐️' : '' 
+    
     return (
-        <CardWrapper style={{display: 'flex', flexDirection: 'column', padding: 15}}>
-            <CardLabel>{label}</CardLabel>
-            <CardImage src={picture} alt="freelance" height={80} width={80} />
-            <CardLabel>{title}</CardLabel>
+        <CardWrapper theme={theme} onClick={() => setIsFavorite(!isFavorite)}>
+            <CardLabel theme={theme}>{label}</CardLabel>
+            <CardImage src={picture} alt="freelance" />
+            <CardTitle theme={theme}>
+                {star} {title} {star}
+            </CardTitle>
         </CardWrapper>
     )
     
