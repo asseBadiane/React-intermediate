@@ -7,6 +7,7 @@ import { Loader } from '../../utils/style/Atoms'
 import { useFetch, useTheme } from '../../utils/hooks'
 
 
+
 const CardsContainer = styled.div`
   display: grid;
   gap: 24px;
@@ -92,7 +93,8 @@ function Freelance() {
         </PageSubtitle>
         {isLoading ? (
           <LoaderWrapper>
-            <Loader theme={theme} />
+            {/* data-testid nous permet d'acceder sur cet element */}
+            <Loader theme={theme} data-testid="loader" />
           </LoaderWrapper>
         ) : (
           <CardsContainer>

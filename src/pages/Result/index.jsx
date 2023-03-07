@@ -96,7 +96,7 @@ function Results() {
 
   return isLoading ? (
     <LoaderWrapper>
-      <Loader />
+      <Loader data-testid="loader" />
     </LoaderWrapper>
   ) : (
     <ResultsContainer theme={theme}>
@@ -104,7 +104,7 @@ function Results() {
         Les compétences dont vous avez besoin :
         {resultsData &&
           resultsData.map((result, index) => (
-            <JobTitle
+            <JobTitle data-testid='job-title'
               key={`result-title-${index}-${result.title}`}
               theme={theme}
             >
@@ -120,12 +120,12 @@ function Results() {
       <DescriptionWrapper>
         {resultsData &&
           resultsData.map((result, index) => (
-            <JobDescription
+            <JobDescription 
               theme={theme}
               key={`result-detail-${index}-${result.title}`}
             >
               <JobTitle theme={theme}>{result.title}</JobTitle>
-              <p>{result.description}</p>
+              <p data-testid='job-description'>{result.description}</p>
             </JobDescription>
           ))}
       </DescriptionWrapper>
