@@ -1,9 +1,10 @@
 // La biblothèque "prop-types" nous permet de sécuriser nos props 
 import PropTypes from 'prop-types'
-import { Component, useState } from 'react'
+import { Component } from 'react'
+// import { Component, useState } from 'react'
 import styled from 'styled-components'
 import DefaultPicture from '../../assets/profile.png'
-import { useTheme } from '../../utils/hooks'
+// import { useTheme } from '../../utils/hooks'
 import colors from '../../utils/style/colors'
 
 const CardLabel = styled.span`
