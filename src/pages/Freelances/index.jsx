@@ -5,6 +5,7 @@ import Card from '../../components/Card'
 import colors from '../../utils/style/colors'
 import { Loader } from '../../utils/style/Atoms'
 import { useFetch, useTheme } from '../../utils/hooks'
+import { Link } from 'react-router-dom'
 
 
 
@@ -59,9 +60,9 @@ function Freelance() {
     // const [freelancersList, setFreelancesList] = useState([])
 
     const {  theme } = useTheme()
-    const { data, isLoading, error } = useFetch(
-      `http://localhost:8000/freelances`
-    )
+  const { data, isLoading, error } = useFetch(
+    `http://localhost:8000/freelances`
+  )
 
   // useEffect(() => {
   //   async function fetchFreelances() {
@@ -79,38 +80,39 @@ function Freelance() {
   //   }
   //     fetchFreelances()
   //       }, [])
-    const freelancersList = data?.freelancersList
+  const freelancersList = data?.freelancersList
 
-    if (error) {
+  if (error) {
       return <span>Oups il y a eu un problème</span>
-    }
+  }
 
-    return (
-      <div>
-        <PageTitle theme={theme}>Trouvez votre prestataire</PageTitle>
-        <PageSubtitle theme={theme}>
-          Chez Shiny nous réunissons les meilleurs profils pour vous.
-        </PageSubtitle>
-        {isLoading ? (
-          <LoaderWrapper>
+  return (
+    <div>
+      <PageTitle theme={theme}>Trouvez votre prestataire</PageTitle>
+      <PageSubtitle theme={theme}>
+        Chez Shiny nous réunissons les meilleurs profils pour vous.
+      </PageSubtitle>
+      {isLoading ? (
+        <LoaderWrapper>
             {/* data-testid nous permet d'acceder sur cet element */}
-            <Loader theme={theme} data-testid="loader" />
-          </LoaderWrapper>
-        ) : (
-          <CardsContainer>
-            {freelancersList.map((profile, index) => (
+          <Loader theme={theme} data-testid="loader" />
+        </LoaderWrapper>
+      ) : (
+        <CardsContainer>
+          {freelancersList?.map((profile) => (
+            <Link key={`freelance-${profile.id}`} to={`/profile/${profile.id}`}>
               <Card
-                key={`${profile.name}-${index}`}
                 label={profile.job}
                 title={profile.name}
                 picture={profile.picture}
+                theme={theme}
               />
-            ))}
-          </CardsContainer>
-        )}
-      </div>
-    )
-
+            </Link>
+          ))}
+        </CardsContainer>
+      )}
+    </div>
+  )
 }
 
 export default Freelance
