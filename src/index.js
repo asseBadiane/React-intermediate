@@ -1,6 +1,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Error from './components/Error';
 import Footer from './components/Footer';
@@ -11,6 +12,7 @@ import Profile from './pages/Profile';
 import Result from './pages/Result';
 import Survey from './pages/Survey'
 import { SurveyProvider, ThemeProvider } from './utils/context';
+import store from './utils/store';
 
 import GlobalStyle from './utils/style/GlobalStyle';
 
@@ -24,6 +26,8 @@ import GlobalStyle from './utils/style/GlobalStyle';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+  <Provider store={store}>
+ 
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider>
@@ -43,5 +47,6 @@ root.render(
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>
+  </Provider>
 );
 
