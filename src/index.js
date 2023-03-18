@@ -6,7 +6,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Error from './components/Error';
 import Footer from './components/Footer';
 import Header from './components/Header';
-import Freelance from './pages/Freelances';
+import Freelances from './pages/Freelances';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Result from './pages/Result';
@@ -27,7 +27,6 @@ import GlobalStyle from './utils/style/GlobalStyle';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
- 
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider>
@@ -37,7 +36,7 @@ root.render(
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/survey/:questionNumber' element={<Survey />} />
-            <Route path='/freelance' element={<Freelance />} />
+            <Route path='/freelance' element={<Freelances />} />
             <Route path='/result' element={<Result />} />
             <Route path='/profile/:id' element={<Profile />}/>
             <Route path='*' element={<Error />} />
