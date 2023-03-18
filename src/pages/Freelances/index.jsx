@@ -4,8 +4,12 @@ import styled from 'styled-components'
 import Card from '../../components/Card'
 import colors from '../../utils/style/colors'
 import { Loader } from '../../utils/style/Atoms'
-import { useFetch, useTheme } from '../../utils/hooks'
+// import { useFetch, useTheme } from '../../utils/hooks'
 import { Link } from 'react-router-dom'
+import { useSelector, useStore } from 'react-redux'
+import { useEffect } from 'react'
+import { fetchOrUpdateFreelances } from '../../features/freelances'
+import { selectFreelances, selectTheme } from '../../utils/selectors'
 
 
 
@@ -53,37 +57,40 @@ const LoaderWrapper = styled.div`
 //     },
 // ]
 
-function Freelance() {
+function Freelances() {
 
     // const [ isDataLoading, setDataLoading ] = useState(false)
     // const [error, setError] = useState(false)
     // const [freelancersList, setFreelancesList] = useState([])
 
-    const {  theme } = useTheme()
-  const { data, isLoading, error } = useFetch(
-    `http://localhost:8000/freelances`
-  )
+  // const {  theme } = useTheme()
+  // const { data, isLoading, error } = useFetch(
+  //   `http://localhost:8000/freelances`
+  // )
+  // const freelancersList = data?.freelancersList
 
-  // useEffect(() => {
-  //   async function fetchFreelances() {
-  //     setDataLoading(true)
-  //     try {
-  //       const response = await fetch(`http://localhost:8000/freelances`)
-  //       const { freelancersList } = await response.json()
-  //       setFreelancesList(freelancersList)
-  //     } catch (err) {
-  //       console.log('===== error =====', err)
-  //       setError(true)
-  //     } finally {
-  //       setDataLoading(false)
-  //     }
-  //   }
-  //     fetchFreelances()
-  //       }, [])
-  const freelancersList = data?.freelancersList
+  // if (error) {reelancersList?.map((profile)
+  //     return <span>Oups il y a eu un problème</span>
+  // }
 
-  if (error) {
-      return <span>Oups il y a eu un problème</span>
+  // on récupère le store grâce au hook useStore()
+  const store = useStore()
+
+  // on utilise useEffect pour lancer la requête au chargement du composant
+  useEffect(() => {
+    // on exécute notre action asynchrone avec le store en paramètre
+    fetchOrUpdateFreelances(store)
+    // On suit la recommandation d'ESLint de passer le store
+    // en dépendances car il est utilisé dans l'effet
+    // cela n'as pas d'impacte sur le fonctionnement car le store ne change jamais
+  }, [store])
+
+  const theme = useSelector(selectTheme)
+
+  const freelances = useSelector(selectFreelances)
+
+  if (freelances.status === 'rejected') {
+    return <span>Il y a un problème</span>
   }
 
   return (
@@ -92,14 +99,14 @@ function Freelance() {
       <PageSubtitle theme={theme}>
         Chez Shiny nous réunissons les meilleurs profils pour vous.
       </PageSubtitle>
-      {isLoading ? (
+      {freelances.status === 'pending' || freelances.status === 'void' ?  (
         <LoaderWrapper>
             {/* data-testid nous permet d'acceder sur cet element */}
           <Loader theme={theme} data-testid="loader" />
         </LoaderWrapper>
       ) : (
         <CardsContainer>
-          {freelancersList?.map((profile) => (
+          {freelances.data.freelancersList.map((profile)  => (
             <Link key={`freelance-${profile.id}`} to={`/profile/${profile.id}`}>
               <Card
                 label={profile.job}
@@ -115,4 +122,4 @@ function Freelance() {
   )
 }
 
-export default Freelance
+export default Freelances

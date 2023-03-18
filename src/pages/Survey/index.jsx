@@ -1,10 +1,13 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import colors from '../../utils/style/colors'
 import { Loader } from '../../utils/style/Atoms'
 import { SurveyContext } from "../../utils/context";
+import { useSelector, useStore } from "react-redux";
+import { selectSurvey, selectTheme } from "../../utils/selectors";
+import { fetchOrUpdateSurvey } from "../../features/survey";
 
 
 const SurveyContainer = styled.div`
@@ -80,67 +83,81 @@ const ReplyWrapper = styled.div`
     const questionNumberInt = parseInt(questionNumber)
     const prevQuestionNumber = questionNumberInt === 1 ? 1 : questionNumberInt - 1
     const nextQuestionNumber = questionNumberInt + 1
-    const [surveyData, setSurveyData] = useState({})
-    const [isDataLoading, setDataLoading] = useState(false)
+    // const [surveyData, setSurveyData] = useState({})
+    // const [isDataLoading, setDataLoading] = useState(false)
     const { answers, saveAnswers } = useContext(SurveyContext)
-    const [error, setError] = useState(false)
+    // const [error, setError] = useState(false)
   
     function saveReply(answer) {
       saveAnswers({ [questionNumber]: answer })
     }
-  
+    // useEffect(() => {
+    //   async function fetchSurvey() {
+    //     setDataLoading(true)
+    //     try {
+    //       const response = await fetch(`http://localhost:8000/survey`)
+    //       const { surveyData } = await response.json()
+    //       setSurveyData(surveyData)
+    //     } catch (err) {
+    //       console.log(err)
+    //       setError(true)
+    //     } finally {
+    //       setDataLoading(false)
+    //     }
+    //   }
+    //   fetchSurvey()
+    // }, [])
+    // if (error) {
+    //   return <span>Oups il y a eu un problème</span>
+    // }
+    const theme = useSelector(selectTheme)
+    const survey = useSelector(selectSurvey)
+    const store = useStore()
     useEffect(() => {
-      async function fetchSurvey() {
-        setDataLoading(true)
-        try {
-          const response = await fetch(`http://localhost:8000/survey`)
-          const { surveyData } = await response.json()
-          setSurveyData(surveyData)
-        } catch (err) {
-          console.log(err)
-          setError(true)
-        } finally {
-          setDataLoading(false)
-        }
-      }
-      fetchSurvey()
-    }, [])
-  
-    if (error) {
-      return <span>Oups il y a eu un problème</span>
-    }
+      fetchOrUpdateSurvey(store)
+    }, [store])
+
+    const surveyData = survey.data?.surveyData
+    const isLoading = survey.status === 'void' || survey.status === 'pending'
+    if (survey.status === 'rejected') {
+      return <span>Il y a un problème</span>
+    } 
   
     return (
       <SurveyContainer>
-        <QuestionTitle>Question {questionNumber}</QuestionTitle>
-        {isDataLoading ? (
-          <Loader />
+      <QuestionTitle theme={theme}>Question {questionNumber}</QuestionTitle>
+      {isLoading ? (
+        <Loader data-testid="loader" />
+      ) : (
+        <QuestionContent theme={theme} data-testid="question-content">
+          {surveyData && surveyData[questionNumber]}
+        </QuestionContent>
+      )}
+      <ReplyWrapper>
+        <ReplyBox
+          onClick={() => saveReply(true)}
+          isSelected={answers[questionNumber] === true}
+          theme={theme}
+        >
+          Oui
+        </ReplyBox>
+        <ReplyBox
+          onClick={() => saveReply(false)}
+          isSelected={answers[questionNumber] === false}
+          theme={theme}
+        >
+          Non
+        </ReplyBox>
+      </ReplyWrapper>
+      <LinkWrapper theme={theme}>
+        <Link to={`/survey/${prevQuestionNumber}`}>Précédent</Link>
+        {surveyData && surveyData[questionNumberInt + 1] ? (
+          <Link to={`/survey/${nextQuestionNumber}`}>Suivant</Link>
         ) : (
-          <QuestionContent>{surveyData[questionNumber]}</QuestionContent>
+          <Link to="/results">Résultats</Link>
         )}
-        <ReplyWrapper>
-          <ReplyBox
-            onClick={() => saveReply(true)}
-            isSelected={answers[questionNumber] === true}
-          >
-            Oui
-          </ReplyBox>
-          <ReplyBox
-            onClick={() => saveReply(false)}
-            isSelected={answers[questionNumber] === false}
-          >
-            Non
-          </ReplyBox>
-        </ReplyWrapper>
-        <LinkWrapper>
-          <Link to={`/survey/${prevQuestionNumber}`}>Précédent</Link>
-          {surveyData[questionNumberInt + 1] ? (
-            <Link to={`/survey/${nextQuestionNumber}`}>Suivant</Link>
-          ) : (
-            <Link to="/results">Résultats</Link>
-          )}
-        </LinkWrapper>
-      </SurveyContainer>
+      </LinkWrapper>
+    </SurveyContainer>
     )
   }
   
