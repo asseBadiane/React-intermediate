@@ -1,9 +1,13 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { SurveyContext } from '../../utils/context'
 import styled from 'styled-components'
 import colors from '../../utils/style/colors'
 import { useFetch, useTheme } from '../../utils/hooks'
 import { StyledLink, Loader } from '../../utils/style/Atoms'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchOrUpdateResults } from '../../features/results'
+import { selectResults } from '../../utils/selectors'
+import EmptyList from '../../components/EmptyList'
 
 
 const ResultsContainer = styled.div`
@@ -79,57 +83,76 @@ export function formatQueryParams(answers) {
   }, '')
 }
 
+// export function formatJobList(title, listLength, index) {
+//   if (index === listLength - 1) {
+//     return title
+//   } else {
+//     return `${title},`
+//   }
+// }
+
 function Results() {
   const { theme } = useTheme()
   const { answers } = useContext(SurveyContext)
-  // const fetchParams = formatQueryParams(answers)
-  const queryParams = formatQueryParams(answers)
-  const { data, isLoading, error } = useFetch(
-    `http://localhost:8000/results?${queryParams}`
-  )
+  const fetchParams = formatQueryParams(answers)
+  // const queryParams = formatQueryParams(answers)
+  // const { data, isLoading, error } = useFetch(
+  //   `http://localhost:8000/results?${queryParams}`
+  // )
+  const results = useSelector(selectResults)
 
-  if (error) {
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(fetchOrUpdateResults)
+  }, [dispatch])
+
+  if (results.status === 'rejected') {
     return <span>Il y a un problème</span>
   }
 
-  const resultsData = data?.resultsData
+  const resultsData = results.data?.resultsData
+
+  const isLoading = results.status === 'void' || results.status === 'pending' || results.status === 'updating'
+  if (resultsData?.length < 1) {
+    return <EmptyList theme={theme} />
+  }
 
   return isLoading ? (
     <LoaderWrapper>
-      <Loader data-testid="loader" />
-    </LoaderWrapper>
-  ) : (
-    <ResultsContainer theme={theme}>
-      <ResultsTitle theme={theme}>
-        Les compétences dont vous avez besoin :
-        {resultsData &&
-          resultsData.map((result, index) => (
-            <JobTitle data-testid='job-title'
-              key={`result-title-${index}-${result.title}`}
-              theme={theme}
-            >
-              {/* {result.title}
-              {index === resultsData.length - 1 ? '' : ','} */}
-              {formatJobList(result.title, resultsData.length, index)}
+    <Loader data-testid="loader" />
+  </LoaderWrapper>
+) : (
+  <ResultsContainer theme={theme}>
+    <ResultsTitle theme={theme}>
+      Les compétences dont vous avez besoin :
+      {resultsData &&
+        resultsData.map((result, index) => (
+          <JobTitle
+            key={`result-title-${index}-${result.title}`}
+            theme={theme}
+          >
+            {formatJobList(result.title, resultsData.length, index)}
+          </JobTitle>
+        ))}
+    </ResultsTitle>
+    <StyledLink $isFullLink to="/freelances">
+      Découvrez nos profils
+    </StyledLink>
+    <DescriptionWrapper>
+      {resultsData &&
+        resultsData.map((result, index) => (
+          <JobDescription
+            theme={theme}
+            key={`result-detail-${index}-${result.title}`}
+          >
+            <JobTitle theme={theme} data-testid="job-title">
+              {result.title}
             </JobTitle>
-          ))}
-      </ResultsTitle>
-      <StyledLink $isFullLink to="/freelances">
-        Découvrez nos profils
-      </StyledLink>
-      <DescriptionWrapper>
-        {resultsData &&
-          resultsData.map((result, index) => (
-            <JobDescription 
-              theme={theme}
-              key={`result-detail-${index}-${result.title}`}
-            >
-              <JobTitle theme={theme}>{result.title}</JobTitle>
-              <p data-testid='job-description'>{result.description}</p>
-            </JobDescription>
-          ))}
-      </DescriptionWrapper>
-    </ResultsContainer>
+            <p data-testid="job-description">{result.description}</p>
+          </JobDescription>
+        ))}
+    </DescriptionWrapper>
+  </ResultsContainer>
   )
 }
 
