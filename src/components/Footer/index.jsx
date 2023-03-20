@@ -1,8 +1,10 @@
 import styled from 'styled-components'
 // import { ThemeContext } from '../../utils/context'
-import { useTheme } from '../../utils/hooks'
+// import { useTheme } from '../../utils/hooks'
 import colors from '../../utils/style/colors'
-
+import * as themeActions from '../../features/theme'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectTheme } from '../../utils/selectors'
  
 const FooterContainer = styled.footer`
     display: flex;
@@ -20,10 +22,12 @@ const NightModeButton = styled.button`
 `
  
 function Footer() {
-    const { toggleTheme, theme } = useTheme()
+    // const { toggleTheme, theme } = useTheme()
+    const theme = useSelector(selectTheme)
+    const dispatch = useDispatch()
     return (
         <FooterContainer>
-            <NightModeButton onClick={() => toggleTheme()}>
+            <NightModeButton onClick={() => dispatch(themeActions.toggle())}>
                 Changer de mode : {theme === 'light' ? '☀️' : '🌙'}
             </NightModeButton>
         </FooterContainer>
