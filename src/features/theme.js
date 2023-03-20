@@ -1,6 +1,6 @@
 // On utilise des variables pour les noms des actions
 
-import { createAction, createReducer } from "@reduxjs/toolkit"
+import { createSlice } from "@reduxjs/toolkit"
 
 // Ancien méthode
 // pour éviter les fautes de frappe
@@ -25,18 +25,42 @@ import { createAction, createReducer } from "@reduxjs/toolkit"
 // }
 
 // Le Methode avec createAction()
-export const toggleTheme = createAction('theme/toggle')
-export const setTheme = createAction('theme/set')
+// export const toggleTheme = createAction('theme/toggle')
+// export const setTheme = createAction('theme/set')
 
-export default createReducer('light', (builder) => {
-    builder
-    .addCase(toggleTheme, (state) => {
-        return  state === 'light' ? 'dark' : 'light'
-    })
-    .addCase(setTheme, (state, action) => {
-        return action.payload
-    })
+// export default createReducer('light', (builder) => {
+//     builder
+//     .addCase(toggleTheme, (state) => {
+//         return  state === 'light' ? 'dark' : 'light'
+//     })
+//     .addCase(setTheme, (state, action) => {
+//         return action.payload
+//     })
 
+// })
+
+//La methode Avec createSlice
+const { actions, reducer } = createSlice({
+    // le nom du slice
+    name: 'theme',
+    // le state initial
+    intialState: 'light',
+    // reducers permet de définir les actions et le reducer
+    reducers: {
+         // l'action toggle ('theme/toggle')
+        toggle: (state) => {
+            return  state === 'light' ? 'dark' : 'light'
+        },
+          // l'action set ('theme/set')
+        set:   (state, action) => {
+            return action.payload
+        }
+
+        }
+    
 })
 
-
+// on export chaque action individuellement
+export const { set, toggle } = actions
+// on export le reducer comme default export
+export default reducer
