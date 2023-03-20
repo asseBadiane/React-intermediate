@@ -43,28 +43,33 @@ const freelanceRejected = ('freelance/rejected', (freelanceId, error) => {
   }
 } )
 
-export async function fetchOrUpdateFreelance(store, freelanceId) {
-  const selectFreelanceById = selectFreelance(freelanceId)
-  const status = selectFreelanceById(store.getState()).status
-  if (status === 'pending' || status === 'updating') {
-    return
+export async function fetchOrUpdateFreelance(freelanceId) {
+  return async (dispatch, getState) => {
+    const selectFreelanceById = selectFreelance(freelanceId)
+    const status = selectFreelanceById(getState()).status
+    if (status === 'pending' || status === 'updating') {
+      return
+    }
+    dispatch(freelanceFetching(freelanceId))
+    try {
+      const response = await fetch(
+        `http://localhost:8000/freelance?id=${freelanceId}`
+      )
+      const data = await response.json()
+      dispatch(freelanceResolved(freelanceId, data))
+    } catch (error) {
+      dispatch(freelanceRejected(freelanceId, error))
+    }
   }
-  store.dispatch(freelanceFetching(freelanceId))
-  try {
-    const response = await fetch(
-      `http://localhost:8000/freelance?id=${freelanceId}`
-    )
-    const data = await response.json()
-    store.dispatch(freelanceResolved(freelanceId, data))
-  } catch (error) {
-    store.dispatch(freelanceRejected(freelanceId, error))
-  }
+  
 }
+
 function setVoidIfUndefined(draft, freelanceId) {
   if (draft[freelanceId] === undefined) {
     draft[freelanceId] = { status: 'void' }
   }
 }
+
 
 export default createReducer(initialState, (builder) =>
   builder

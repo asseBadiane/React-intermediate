@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useParams } from 'react-router-dom'
 import colors from '../../utils/style/colors'
 // import { ThemeContext } from '../../utils/context'
-import { useSelector, useStore } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { selectFreelance, selectTheme } from '../../utils/selectors'
 import { fetchOrUpdateFreelance } from '../../features/freelance'
 
@@ -106,10 +106,10 @@ function Profile() {
 
   const theme = useSelector(selectTheme)
   const { id: freelanceId } = useParams()
-  const store = useStore()
+  const dispatch = useDispatch()
   useEffect(() => {
-    fetchOrUpdateFreelance(store, freelanceId)
-  }, [store, freelanceId])
+    dispatch(fetchOrUpdateFreelance(freelanceId))
+  }, [dispatch, freelanceId])
   const freelance = useSelector(selectFreelance(freelanceId))
 
   const profileData = freelance.data?.freelanceData ?? {}
