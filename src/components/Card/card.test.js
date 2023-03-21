@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import Card from "."
 import { ThemeProvider } from "../../utils/context"
+// import { render } from "../../utils/test"
 
 describe('Card', () => {
     test('Should render title and image', async () => {
@@ -33,5 +34,4 @@ describe('Card', () => {
         fireEvent.click(parentNode)
         expect(cardTitle.textContent).toBe('⭐️ Harry Potter ⭐️')
     })
-    
 })
