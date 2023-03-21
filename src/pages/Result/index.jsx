@@ -1,13 +1,16 @@
-import { useContext, useEffect } from 'react'
+// import { useContext, useEffect } from 'react'
 import { SurveyContext } from '../../utils/context'
-import styled from 'styled-components'
-import colors from '../../utils/style/colors'
-import { useFetch, useTheme } from '../../utils/hooks'
-import { StyledLink, Loader } from '../../utils/style/Atoms'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchOrUpdateResults } from '../../features/results'
-import { selectResults } from '../../utils/selectors'
+import styled, { useTheme } from 'styled-components'
+// import { useFetch, useTheme } from '../../utils/hooks'
+// import { StyledLink, Loader } from '../../utils/style/Atoms'
+// import { useDispatch, useSelector } from 'react-redux'
+// import { fetchOrUpdateResults } from '../../features/results'
+// import { selectResults } from '../../utils/selectors'
 import EmptyList from '../../components/EmptyList'
+import { useQueries } from 'react-query'
+import { useContext } from 'react'
+import { Loader, StyledLink } from '../../utils/style/Atoms'
+import colors from '../../utils/style/colors'
 
 
 const ResultsContainer = styled.div`
@@ -99,20 +102,31 @@ function Results() {
   // const { data, isLoading, error } = useFetch(
   //   `http://localhost:8000/results?${queryParams}`
   // )
-  const results = useSelector(selectResults)
+  // const results = useSelector(selectResults)
 
-  const dispatch = useDispatch()
-  useEffect(() => {
-    dispatch(fetchOrUpdateResults)
-  }, [dispatch])
+  // const dispatch = useDispatch()
+  // useEffect(() => {
+  //   dispatch(fetchOrUpdateResults)
+  // }, [dispatch])
 
-  if (results.status === 'rejected') {
-    return <span>Il y a un problème</span>
-  }
+  // if (results.status === 'rejected') {
+  //   return <span>Il y a un problème</span>
+  // }
 
-  const resultsData = results.data?.resultsData
+  const { data, isLoading, error } = 
+  useQueries(['results', fetchParams], async () => {
+    const response = await fetch(`http://localhost:8000/results?${fetchParams}`)
+    const data = await response.json()
+    return data
 
-  const isLoading = results.status === 'void' || results.status === 'pending' || results.status === 'updating'
+  })
+   if (error) {
+      return <span>Il y a un problème</span>
+    }
+
+  const resultsData = data?.resultsData
+
+  // const isLoading = results.status === 'void' || results.status === 'pending' || results.status === 'updating'
   if (resultsData?.length < 1) {
     return <EmptyList theme={theme} />
   }

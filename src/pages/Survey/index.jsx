@@ -1,13 +1,17 @@
-import { useContext, useEffect } from "react";
+// import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import colors from '../../utils/style/colors'
 import { Loader } from '../../utils/style/Atoms'
-import { SurveyContext } from "../../utils/context";
+// import { SurveyContext } from "../../utils/context";
 import { useDispatch, useSelector } from "react-redux";
-import { selectSurvey, selectTheme } from "../../utils/selectors";
-import { fetchOrUpdateSurvey } from "../../features/survey";
+// import { selectSurvey, selectTheme } from "../../utils/selectors";
+// import { fetchOrUpdateSurvey } from "../../features/survey";
+import { useQueries } from "react-query";
+import { saveAnswer } from "../../features/answers";
+// import { useContext } from "react";
+import { selectAnswers, selectTheme } from "../../utils/selectors";
 
 
 const SurveyContainer = styled.div`
@@ -85,12 +89,13 @@ const ReplyWrapper = styled.div`
     const nextQuestionNumber = questionNumberInt + 1
     // const [surveyData, setSurveyData] = useState({})
     // const [isDataLoading, setDataLoading] = useState(false)
-    const { answers, saveAnswers } = useContext(SurveyContext)
+    // const { answers, saveAnswers } = useContext(SurveyContext)
     // const [error, setError] = useState(false)
+    const answers = useSelector(selectAnswers)
   
-    function saveReply(answer) {
-      saveAnswers({ [questionNumber]: answer })
-    }
+    // function saveReply(answer) {
+    //   saveAnswers({ [questionNumber]: answer })
+    // }
     // useEffect(() => {
     //   async function fetchSurvey() {
     //     setDataLoading(true)
@@ -111,15 +116,25 @@ const ReplyWrapper = styled.div`
     //   return <span>Oups il y a eu un problème</span>
     // }
     const theme = useSelector(selectTheme)
-    const survey = useSelector(selectSurvey)
+    // const survey = useSelector(selectSurvey)
     const dispatch = useDispatch()
-    useEffect(() => {
-      dispatch(fetchOrUpdateSurvey)
-    }, [dispatch] )
+    // useEffect(() => {
+    //   dispatch(fetchOrUpdateSurvey)
+    // }, [dispatch] )
 
-    const surveyData = survey.data?.surveyData
-    const isLoading = survey.status === 'void' || survey.status === 'pending'
-    if (survey.status === 'rejected') {
+    const { data, isLoading, error } = useQueries('survey', async () => {
+      const response = fetch(`http://localhost:8000/survey`)
+      const data = await response.json()
+      return data
+    } )
+
+    function saveReply(answer) {
+      dispatch(saveAnswer({ questionNumber, answer }))
+    }
+
+    const surveyData = data?.surveyData
+    // const isLoading = survey.status === 'void' || survey.status === 'pending'
+    if (error) {
       return <span>Il y a un problème</span>
     } 
   

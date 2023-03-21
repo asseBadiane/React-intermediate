@@ -1,11 +1,14 @@
-import { useEffect } from 'react'
+// import { useEffect } from 'react'
 import styled from 'styled-components'
 import { useParams } from 'react-router-dom'
 import colors from '../../utils/style/colors'
 // import { ThemeContext } from '../../utils/context'
-import { useDispatch, useSelector } from 'react-redux'
-import { selectFreelance, selectTheme } from '../../utils/selectors'
-import { fetchOrUpdateFreelance } from '../../features/freelance'
+// import { useDispatch, useSelector } from 'react-redux'
+// import { selectFreelance, selectTheme } from '../../utils/selectors'
+// import { fetchOrUpdateFreelance } from '../../features/freelance'
+import { useQueries } from 'react-query'
+import { useSelector } from 'react-redux'
+import { selectTheme } from '../../utils/selectors'
 
 const ProfileWrapper = styled.div`
   display: flex;
@@ -105,15 +108,24 @@ function Profile() {
   //   profileData
 
   const theme = useSelector(selectTheme)
+  // const { id: freelanceId } = useParams()
+  // const dispatch = useDispatch()
+  // useEffect(() => {
+  //   dispatch(fetchOrUpdateFreelance(freelanceId))
+  // }, [dispatch, freelanceId])
+  // const freelance = useSelector(selectFreelance(freelanceId))
+
+  // const profileData = freelance.data?.freelanceData ?? {}
+
   const { id: freelanceId } = useParams()
-  const dispatch = useDispatch()
-  useEffect(() => {
-    dispatch(fetchOrUpdateFreelance(freelanceId))
-  }, [dispatch, freelanceId])
-  const freelance = useSelector(selectFreelance(freelanceId))
-
-  const profileData = freelance.data?.freelanceData ?? {}
-
+  const { data } = useQueries(['freelance', freelanceId],
+     async () => {
+   
+    const response = await fetch(`http://localhost:8000/freelance?id=${freelanceId}`)
+    const data = await response.json()
+    return data
+  })
+  const profileData = data?.freelanceData ?? {}
   const { picture, name, location, tjm, job, skills, available, id } =
     profileData
 
