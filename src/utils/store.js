@@ -1,9 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
-import freelanceReducer from '../features/freelance'
 // import { combineReducers, createStore } from 'redux'
+import freelanceReducer from '../features/freelance'
 import freelancesReducer from '../features/freelances'
 import surveyReducer from '../features/survey'
 import themeReducer from '../features/theme'
+import resultsReducer from '../features/results'
+import answersReducer from '../features/answers'
+
 
 export default configureStore({
    reducer : {
@@ -11,6 +14,8 @@ export default configureStore({
     freelances: freelancesReducer,
     survey: surveyReducer,
     freelance: freelanceReducer,
+    results: resultsReducer,
+    answers: answersReducer,
    }
 })
 
