@@ -1,6 +1,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { Provider } from 'react-redux';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Error from './components/Error';
@@ -24,28 +25,34 @@ import GlobalStyle from './utils/style/GlobalStyle';
 //     }
 // `
 
+// On creer le 
+const queryClient = new QueryClient()
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <Provider store={store}>
-  <React.StrictMode>
-    <BrowserRouter>
-      <ThemeProvider>
-        <SurveyProvider>
-          <GlobalStyle />
-          <Header />
-          <Routes>
-            <Route path='/' element={<Home />} />
-            <Route path='/survey/:questionNumber' element={<Survey />} />
-            <Route path='/freelance' element={<Freelances />} />
-            <Route path='/result' element={<Result />} />
-            <Route path='/profile/:id' element={<Profile />}/>
-            <Route path='*' element={<Error />} />
-          </Routes>
-          <Footer />
-        </SurveyProvider>
-      </ThemeProvider>
-    </BrowserRouter>
-  </React.StrictMode>
-  </Provider>
+  <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
+    <React.StrictMode>
+      <BrowserRouter>
+        <ThemeProvider>
+          <SurveyProvider>
+            <GlobalStyle />
+            <Header />
+            <Routes>
+              <Route path='/' element={<Home />} />
+              <Route path='/survey/:questionNumber' element={<Survey />} />
+              <Route path='/freelance' element={<Freelances />} />
+              <Route path='/result' element={<Result />} />
+              <Route path='/profile/:id' element={<Profile />}/>
+              <Route path='*' element={<Error />} />
+            </Routes>
+            <Footer />
+          </SurveyProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </React.StrictMode>
+    </Provider>
+  </QueryClientProvider>
+
 );
 
